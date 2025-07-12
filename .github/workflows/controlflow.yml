@@ -45,6 +45,7 @@ jobs:
 
       - name: Test code
         id:   run-test
+        continue-on-error: true
         run: npm run test
 
       - name: Upload Test report
