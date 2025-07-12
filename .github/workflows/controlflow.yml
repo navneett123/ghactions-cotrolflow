@@ -99,3 +99,13 @@ jobs:
       - name: Deploy
         run: echo "Deploying"
 
+
+  report:
+    runs-on: ubuntu-latest
+    needs: [lint,deploy]
+    if: failure()
+    steps:
+      - name: Output Information
+        run: |
+         echo "Something went wrong"
+         echo "${{github}}"
