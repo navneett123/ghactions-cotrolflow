@@ -4,6 +4,93 @@ on:
     branches:
       -  master
 
+  workflow_dispatch:
+
 jobs:
   lint:
     runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{runner.os}}-npm-${{hashFiles('**/package-lock.json')}}
+      
+      - name: Lint Code
+        run: npm run lint 
+
+  
+  
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+
+      - name: cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{runner.os}}-npm-${{'**/package-lock.json'}}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test code
+        run: npm run test
+
+      - name: Upload Test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: test.report.json
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+
+      - name: Cache Dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{runner.os}}-npm-${{hashFiles('**/package-lock.json')}}
+      
+      - name: Install Dependencies
+        run: npm ci
+
+
+      - name: build project
+        run: npm run build
+
+
+      - name: uploads artifacts
+        uses: actions/upload-artifacts@v3
+        with:
+          name: dist-files
+          path: dist
+
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Build Artifacts
+        uses: actions/download-artifacts@v3
+        with:
+          name: dist-files
+
+      - name: output contents
+        run: ls
+
+      
+      - name: Deploy
+        run: echo "Deploying"
+

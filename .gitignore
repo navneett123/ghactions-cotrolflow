@@ -49,3 +49,4 @@ Thumbs.db
 
 # Optional: compiled frontend output from Babel or similar
 babel-cache/
+*.report.js
