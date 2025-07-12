@@ -7,7 +7,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src/*.js",
-    "test": "jest --json --outputFile=test.report.js"
+    "test": "jest --json --outputFile=test.report.json"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
