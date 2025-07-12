@@ -18,6 +18,9 @@ jobs:
         with:
           path: ~/.npm
           key: ${{runner.os}}-npm-${{hashFiles('**/package-lock.json')}}
+
+      - name: Install Dependencies
+        run: npm ci
       
       - name: Lint Code
         run: npm run lint 
@@ -44,7 +47,7 @@ jobs:
         run: npm run test
 
       - name: Upload Test report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-report
           path: test.report.json
@@ -72,7 +75,7 @@ jobs:
 
 
       - name: uploads artifacts
-        uses: actions/upload-artifacts@v3
+        uses: actions/upload-artifacts@v4
         with:
           name: dist-files
           path: dist
@@ -83,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get Build Artifacts
-        uses: actions/download-artifacts@v3
+        uses: actions/download-artifacts@v4
         with:
           name: dist-files
 
