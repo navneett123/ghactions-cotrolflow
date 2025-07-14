@@ -1,0 +1,96 @@
+name: Using Reusable Workflow
+on: 
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{runner.os}}-npm-${{hashFiles('**/package-lock.json')}}
+
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Lint Code
+        run: npm run lint 
+
+  
+  
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+
+      - name: cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{runner.os}}-npm-${{'**/package-lock.json'}}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test code
+        id:   run-test
+        continue-on-error: true
+        run: npm run test
+
+      - name: Upload Test report
+        if: failure() && steps.run-test.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: test.report.json
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+
+      - name: Cache Dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{runner.os}}-npm-${{hashFiles('**/package-lock.json')}}
+      
+      - name: Install Dependencies
+        run: npm ci
+
+
+      - name: build project
+        run: npm run build
+
+
+      - name: uploads artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-files
+          path: dist
+
+  
+  deploy:
+    needs: build
+    uses: ./.github/workflows/reusable.yml
+
+
+  report:
+    runs-on: ubuntu-latest
+    needs: [lint,deploy]
+    if: failure()
+    steps:
+      - name: Output Information
+        run: |
+         echo "Something went wrong"
+         echo "${{github}}"

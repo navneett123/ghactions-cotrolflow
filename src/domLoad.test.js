@@ -19,6 +19,6 @@ describe("CloudDash Feedback DOM Load", () => {
 
   test("should load the heading", () => {
     const heading = document.querySelector("h1");
-    expect(heading.textContent).toContain("Error loading Page");
+    expect(heading.textContent).toContain("CloudDash Feedback");
   });
 });
